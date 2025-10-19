@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal - The Kolkata Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+  <header class="portal-header">
+    <div class="portal-header-content">
+      <h1 class="portal-title">Admin Portal</h1>
+      <div class="portal-user">
+        <div class="user-avatar" id="userAvatar">A</div>
+        <div class="user-info">
+          <div class="user-info-name" id="userName">Admin</div>
+          <div class="user-info-role">Administrator</div>
+        </div>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="portal-layout">
+    <aside class="portal-sidebar">
+      <ul class="portal-sidebar-menu">
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link active" data-view="dashboard">
+            📊 Dashboard
+          </a>
+        </li>
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link" data-view="articles">
+            📄 All Articles
+          </a>
+        </li>
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link" data-view="review">
+            ⏰ Pending Review
+            <span id="reviewBadge" class="review-badge"></span>
+          </a>
+        </li>
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link" data-view="users">
+            👥 Users
+          </a>
+        </li>
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link" data-view="analytics">
+            📈 Analytics
+          </a>
+        </li>
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link" data-view="settings">
+            ⚙️ Settings
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="portal-main">
+      <!-- Dashboard View -->
+      <div id="dashboardView" class="portal-view">
+        <div class="stats-grid" id="statsGrid">
+          <!-- Stats will be loaded by JS -->
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Recent Articles</h2>
+            </div>
+            <div id="recentArticles"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Top Performing</h2>
+            </div>
+            <div id="topArticles"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Articles View -->
+      <div id="articlesView" class="portal-view" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">All Articles</h2>
+            <div style="display: flex; gap: 12px;">
+              <input 
+                type="text" 
+                id="searchArticles" 
+                placeholder="Search articles..."
+                style="padding: 8px 16px; border: 1px solid var(--border); border-radius: 6px; width: 250px;"
+              >
+              <select id="filterStatus" style="padding: 8px 16px; border: 1px solid var(--border); border-radius: 6px;">
+                <option value="">All Status</option>
+                <option value="published">Published</option>
+                <option value="review">In Review</option>
+                <option value="draft">Draft</option>
+              </select>
+            </div>
+          </div>
+          <div id="allArticlesList"></div>
+        </div>
+      </div>
+
+      <!-- Review View -->
+      <div id="reviewView" class="portal-view" style="display: none;">
+        <div class="card">
+          <h2 class="card-title">Pending Review</h2>
+          <div id="reviewArticlesList"></div>
+        </div>
+      </div>
+
+      <!-- Users View -->
+      <div id="usersView" class="portal-view" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Users & Authors</h2>
+            <button class="btn-primary" onclick="alert('Add user feature coming soon!')">
+              ➕ Add User
+            </button>
+          </div>
+          <div id="usersList"></div>
+        </div>
+      </div>
+
+      <!-- Analytics View -->
+      <div id="analyticsView" class="portal-view" style="display: none;">
+        <div class="card">
+          <h2 class="card-title">Analytics Overview</h2>
+          
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 30px 0;">
+            <div style="text-align: center; padding: 30px; background: #ebf5fb; border-radius: 12px;">
+              <div style="font-size: 3em; font-weight: 700; color: #3498db;" id="totalViewsAnalytics">0</div>
+              <div style="color: var(--text-medium); margin-top: 8px;">Total Views (30 days)</div>
+            </div>
+            <div style="text-align: center; padding: 30px; background: #eafaf1; border-radius: 12px;">
+              <div style="font-size: 3em; font-weight: 700; color: #27ae60;" id="avgEngagementAnalytics">0</div>
+              <div style="color: var(--text-medium); margin-top: 8px;">Avg Engagement</div>
+            </div>
+            <div style="text-align: center; padding: 30px; background: #f4ecf7; border-radius: 12px;">
+              <div style="font-size: 3em; font-weight: 700; color: #9b59b6;" id="avgViewsAnalytics">0</div>
+              <div style="color: var(--text-medium); margin-top: 8px;">Avg Views per Article</div>
+            </div>
+          </div>
+
+          <h3 style="margin: 30px 0 20px 0; font-size: 1.3em;">Top Categories by Views</h3>
+          <div id="categoryStats"></div>
+
+          <h3 style="margin: 30px 0 20px 0; font-size: 1.3em;">Top Authors by Performance</h3>
+          <div id="authorStats"></div>
+        </div>
+      </div>
+
+      <!-- Settings View -->
+      <div id="settingsView" class="portal-view" style="display: none;">
+        <div class="card">
+          <h2 class="card-title">System Settings</h2>
+          <p style="color: var(--text-medium); margin-top: 20px;">
+            Settings panel coming soon...
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/js/core/data.js"></script>
+  <script src="../assets/js/admin/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - The Kolkata Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+  <!-- AUTHENTICATED USER HOMEPAGE -->
+  
+  <header class="header">
+    <div class="header-content">
+      <a href="reader/home.html" class="logo">শেকড় - The Kolkata Chronicle</a>
+      <div class="header-actions">
+        <a href="#" class="header-link">কলকাতা ক্রনিকল</a>
+        <div id="headerAuthSection">
+          <!-- Will be filled by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav-tabs">
+    <div class="nav-tabs-content">
+      <a href="#" class="nav-tab active" data-tab="home">Home</a>
+      <a href="#" class="nav-tab" data-tab="for-you">For You</a>
+      <a href="#" class="nav-tab" data-tab="following">Following</a>
+      <a href="#" class="nav-tab">আড্ডা</a>
+      <a href="#" class="nav-tab">সংস্কৃতি</a>
+      <a href="#" class="nav-tab">মাছ-ভাত</a>
+      <a href="#" class="nav-tab">Metro</a>
+      <a href="#" class="nav-tab">Heritage</a>
+      <a href="#" class="nav-tab">🎧 Audio</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Home Tab -->
+    <div id="home-content" class="tab-content active">
+      <div class="brief-card">
+        <div class="brief-time">Thursday, October 16, 2025 • 7:30 AM</div>
+        <h1 class="brief-title">মর্নিং ব্রিফ</h1>
+        <p class="brief-subtitle">Everything you need to know about Kolkata today. Your 5-minute companion before the first cup of cha.</p>
+        <div class="brief-actions">
+          <a href="#" class="btn-brief btn-read"><span>📄</span>Read Brief (5 min)</a>
+          <button class="btn-brief btn-listen"><span>🎧</span>Listen to Podcast (2 min)</button>
+        </div>
+      </div>
+
+      <div class="story-grid" id="storyGrid">
+        <!-- Stories will be loaded by JavaScript -->
+      </div>
+    </div>
+
+    <!-- For You Tab -->
+    <div id="for-you-content" class="tab-content">
+      <div class="for-you-section">
+        <h2 class="section-title">Recommended For You</h2>
+        <div id="forYouArticles">
+          <!-- Recommended articles will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Following Tab -->
+    <div id="following-content" class="tab-content">
+      <div class="following-section" id="followingSection">
+        <div class="empty-state" id="followingEmptyState">
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 5em; margin-bottom: 20px; opacity: 0.3;">📚</div>
+            <h3 style="font-size: 1.8em; margin-bottom: 16px; font-weight: 700;">Start Following Authors</h3>
+            <p style="color: var(--text-medium); font-size: 1.1em; margin-bottom: 30px;">
+              Follow your favorite writers to see their latest stories here.
+            </p>
+            <a href="#" class="btn-primary" onclick="showTab('for-you'); return false;">
+              Explore Stories
+            </a>
+          </div>
+        </div>
+        <div id="followingArticlesList" style="display: none;">
+          <!-- Followed authors' articles will appear here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/core/data.js"></script>
+  <script src="../assets/js/reader/home.js"></script>
+</body>
+</html>

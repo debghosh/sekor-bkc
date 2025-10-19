@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>শেকড় - The Kolkata Chronicle | Stories from the Heart of Bengal</title>
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <style>
+    /* Hero Carousel Styles */
+    .hero-carousel {
+      position: relative;
+      height: 85vh;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .carousel-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+
+    .carousel-slide.active {
+      opacity: 1;
+    }
+
+    .carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.5) 50%,
+        rgba(0, 0, 0, 0.8) 100%
+      );
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 0 20px;
+      z-index: 1;
+    }
+
+    .hero-logo {
+      font-size: 4rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-shadow: 2px 4px 12px rgba(0, 0, 0, 0.5);
+      animation: fadeInDown 1s ease-out;
+    }
+
+    .hero-tagline {
+      font-size: 1.8rem;
+      font-weight: 300;
+      margin-bottom: 10px;
+      text-shadow: 1px 2px 8px rgba(0, 0, 0, 0.5);
+      animation: fadeInUp 1s ease-out 0.2s both;
+      letter-spacing: 1px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      text-shadow: 1px 2px 6px rgba(0, 0, 0, 0.5);
+      animation: fadeInUp 1s ease-out 0.4s both;
+      max-width: 700px;
+    }
+
+    .hero-cta-buttons {
+      display: flex;
+      gap: 20px;
+      animation: fadeInUp 1s ease-out 0.6s both;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-hero-primary {
+      background: #DC143C;
+      color: white;
+      padding: 18px 48px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(220, 20, 60, 0.4);
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-hero-primary:hover {
+      background: #B01030;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(220, 20, 60, 0.6);
+    }
+
+    .btn-hero-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 18px 48px;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-hero-secondary:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: white;
+      transform: translateY(-3px);
+    }
+
+    .carousel-indicators {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 2;
+    }
+
+    .carousel-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .carousel-indicator.active {
+      background: white;
+      width: 36px;
+      border-radius: 6px;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Features Section */
+    .features-section {
+      padding: 30px 20px;
+      background: linear-gradient(to bottom, #f8f9fa, white);
+    }
+
+    .features-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+    }
+
+    .section-description {
+      font-size: 1.2rem;
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+      font-size: 3.5rem;
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    .feature-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 16px;
+    }
+
+    .feature-description {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.7;
+    }
+
+    /* Stories Preview Section */
+    .stories-preview {
+      padding: 30px 20px;
+      background: white;
+    }
+
+    .stories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .preview-story-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .preview-story-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .preview-story-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .preview-story-content {
+      padding: 24px;
+    }
+
+    .preview-category {
+      display: inline-block;
+      background: #DC143C;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .preview-story-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .preview-story-excerpt {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .preview-story-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #999;
+    }
+
+    .lock-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 100px 20px;
+      text-align: center;
+    }
+
+    .cta-title {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .cta-description {
+      font-size: 1.3rem;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-price {
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+
+    .cta-price span {
+      font-size: 3rem;
+      font-weight: 800;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-logo {
+        font-size: 2.5rem;
+      }
+
+      .hero-tagline {
+        font-size: 1.3rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+
+      .btn-hero-primary,
+      .btn-hero-secondary {
+        padding: 14px 32px;
+        font-size: 1rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .cta-title {
+        font-size: 2rem;
+      }
+
+      .stories-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header" style="position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: transparent; border-bottom: 1px solid rgba(255,255,255,0.2);">
+    <div class="header-content">
+      <a href="index.html" class="logo" style="color: white; text-shadow: 2px 2px 8px rgba(0,0,0,0.5);">শেকড়</a>
+      <div class="header-actions">
+        <a href="login.html" class="btn-subscribe" style="background: white; color: #DC143C;">Login / Subscribe</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Carousel Section -->
+  <section class="hero-carousel">
+    <div class="carousel-slide active">
+      <img src="https://images.unsplash.com/photo-1558862107-d49ef2a04d72?w=1920&q=80" alt="Durga Puja Pandal">
+    </div>
+    <div class="carousel-slide">
+      <img src="https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=1920&q=80" alt="Howrah Bridge">
+    </div>
+    <div class="carousel-slide">
+      <img src="https://images.unsplash.com/photo-1610193135128-ad522501e040?w=1920&q=80" alt="Victoria Memorial">
+    </div>
+    <div class="carousel-slide">
+      <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1920&q=80" alt="Kolkata Tram">
+    </div>
+    <div class="carousel-slide">
+      <img src="https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=1920&q=80" alt="Kolkata Street">
+    </div>
+
+    <div class="hero-overlay">
+      <h1 class="hero-logo">শেকড়</h1>
+      <p class="hero-tagline">The Kolkata Chronicle</p>
+      <p class="hero-subtitle">
+        Discover authentic stories from the heart of Bengal. Culture, heritage, food, and everything that makes Kolkata extraordinary.
+      </p>
+      <div class="hero-cta-buttons">
+        <a href="login.html" class="btn-hero-primary">Start Reading - ₹99/month</a>
+        <a href="#features" class="btn-hero-secondary">Learn More</a>
+      </div>
+    </div>
+
+    <div class="carousel-indicators">
+      <button class="carousel-indicator active" data-slide="0"></button>
+      <button class="carousel-indicator" data-slide="1"></button>
+      <button class="carousel-indicator" data-slide="2"></button>
+      <button class="carousel-indicator" data-slide="3"></button>
+      <button class="carousel-indicator" data-slide="4"></button>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="features-section">
+    <div class="features-container">
+      <div class="section-header">
+        <h2 class="section-title">Why শেকড়?</h2>
+        <p class="section-description">
+          Your daily companion for everything happening in and around Kolkata
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-icon">📰</span>
+          <h3 class="feature-title">Local Stories</h3>
+          <p class="feature-description">
+            In-depth coverage of Kolkata's culture, heritage, and daily life. Stories you won't find anywhere else.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🎧</span>
+          <h3 class="feature-title">Audio Briefs</h3>
+          <p class="feature-description">
+            Morning briefings you can listen to. Perfect companion with your morning tea.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">✍️</span>
+          <h3 class="feature-title">Expert Writers</h3>
+          <p class="feature-description">
+            Local journalists and writers who know Kolkata inside out. Authentic voices, real stories.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🍛</span>
+          <h3 class="feature-title">মাছ-ভাত</h3>
+          <p class="feature-description">
+            Food, culture, and everything Bengali. From street food to heritage recipes.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🏛️</span>
+          <h3 class="feature-title">Heritage</h3>
+          <p class="feature-description">
+            Preserving and celebrating Kolkata's rich history and architectural marvels.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🚇</span>
+          <h3 class="feature-title">Metro Matters</h3>
+          <p class="feature-description">
+            Daily updates on transport, infrastructure, and what matters to commuters.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stories Preview Section -->
+  <section class="stories-preview">
+    <div class="features-container">
+      <div class="section-header">
+        <h2 class="section-title">Featured Stories</h2>
+        <p class="section-description">
+          A glimpse of what you'll discover with your subscription
+        </p>
+      </div>
+
+      <div class="stories-grid" id="previewStoriesGrid"></div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <h2 class="cta-title">Join Thousands of Readers</h2>
+    <p class="cta-description">
+      Get unlimited access to all stories, audio briefs, and exclusive content
+    </p>
+    <p class="cta-price">
+      Just <span>₹99</span>/month
+    </p>
+    <a href="login.html" class="btn-hero-primary" style="font-size: 1.3rem; padding: 20px 60px;">
+      Subscribe Now
+    </a>
+    <p style="margin-top: 20px; opacity: 0.8; font-size: 0.95rem;">
+      Already a member? <a href="login.html" style="color: white; text-decoration: underline; font-weight: 600;">Sign in here</a>
+    </p>
+  </section>
+
+  <script src="./assets/js/core/data.js"></script>
+  <script>
+    // Carousel functionality
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-slide');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+      slides.forEach(slide => slide.classList.remove('active'));
+      indicators.forEach(indicator => indicator.classList.remove('active'));
+      
+      slides[index].classList.add('active');
+      indicators[index].classList.add('active');
+    }
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+    }
+
+    // Auto advance slides every 5 seconds
+    setInterval(nextSlide, 5000);
+
+    // Manual navigation
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener('click', () => {
+        currentSlide = index;
+        showSlide(currentSlide);
+      });
+    });
+
+    // Load preview stories
+    function loadPreviewStories() {
+      const grid = document.getElementById('previewStoriesGrid');
+      if (!grid) return;
+
+      const publishedArticles = DATA_STORE.getArticlesByStatus('published');
+      
+      grid.innerHTML = publishedArticles.slice(0, 6).map(article => `
+        <div class="preview-story-card" onclick="window.location.href='login.html'">
+          <span class="lock-badge">🔒 Subscribe to Read</span>
+          <img src="${article.image}" alt="${article.title}" class="preview-story-image">
+          <div class="preview-story-content">
+            <span class="preview-category">${article.category}</span>
+            <h3 class="preview-story-title">${article.title}</h3>
+            <p class="preview-story-excerpt">${article.summary}</p>
+            <div class="preview-story-meta">
+              <span>${article.author}</span>
+              <span>${formatDate(article.publishDate)}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const month = date.toLocaleDateString('en-US', { month: 'short' });
+      const day = date.getDate();
+      return `${month} ${day}`;
+    }
+
+    // Check if user is already logged in
+    const user = sessionStorage.getItem('kcc_user');
+    if (user) {
+      window.location.href = 'home.html';
+    } else {
+      loadPreviewStories();
+    }
+
+    // Smooth scroll for Learn More button
+    document.querySelector('a[href="#features"]')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

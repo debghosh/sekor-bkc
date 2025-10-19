@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator Portal - The Kolkata Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  
+  <!-- Quill WYSIWYG Editor -->
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+  
+  <style>
+    /* Quill Editor Custom Styles */
+    #editor-container {
+      height: 500px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1em;
+    }
+    
+    #editor-container:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+    }
+    
+    .ql-toolbar.ql-snow {
+      background: var(--bg-light);
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      border: 2px solid var(--border);
+      border-bottom: none;
+      padding: 12px;
+    }
+    
+    .ql-container.ql-snow {
+      border: 2px solid var(--border);
+      border-top: none;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1em;
+    }
+    
+    #editor-container:focus-within .ql-toolbar.ql-snow,
+    #editor-container:focus-within .ql-container.ql-snow {
+      border-color: var(--primary);
+    }
+    
+    .ql-editor {
+      min-height: 450px;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    
+    .ql-editor h2 {
+      font-size: 1.8em;
+      margin: 1em 0 0.5em;
+      font-weight: 700;
+    }
+    
+    .ql-editor h3 {
+      font-size: 1.4em;
+      margin: 1em 0 0.5em;
+      font-weight: 600;
+    }
+    
+    .ql-editor p {
+      margin-bottom: 1em;
+    }
+    
+    .ql-editor blockquote {
+      border-left: 4px solid var(--primary);
+      padding-left: 16px;
+      margin: 1em 0;
+      font-style: italic;
+      color: var(--text-medium);
+    }
+    
+    .ql-editor pre {
+      background: #f5f5f5;
+      border-radius: 4px;
+      padding: 12px;
+      overflow-x: auto;
+    }
+    
+    .ql-editor code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .ql-editor img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 1em 0;
+    }
+    
+    .ql-snow .ql-stroke {
+      stroke: var(--text-dark);
+    }
+    
+    .ql-snow .ql-fill {
+      fill: var(--text-dark);
+    }
+    
+    .ql-snow .ql-picker-label {
+      color: var(--text-dark);
+    }
+    
+    .ql-snow .ql-picker-options {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    
+    .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label {
+      border-color: var(--primary);
+    }
+    
+    .ql-snow.ql-toolbar button:hover,
+    .ql-snow .ql-toolbar button:hover,
+    .ql-snow.ql-toolbar button.ql-active,
+    .ql-snow .ql-toolbar button.ql-active {
+      color: var(--primary);
+    }
+    
+    .ql-snow.ql-toolbar button:hover .ql-stroke,
+    .ql-snow .ql-toolbar button:hover .ql-stroke,
+    .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+    .ql-snow .ql-toolbar button.ql-active .ql-stroke {
+      stroke: var(--primary);
+    }
+    
+    .ql-snow.ql-toolbar button:hover .ql-fill,
+    .ql-snow .ql-toolbar button:hover .ql-fill,
+    .ql-snow.ql-toolbar button.ql-active .ql-fill,
+    .ql-snow .ql-toolbar button.ql-active .ql-fill {
+      fill: var(--primary);
+    }
+    
+    /* Image Upload Helper */
+    .image-upload-section {
+      margin-bottom: 24px;
+      padding: 20px;
+      background: var(--bg-light);
+      border-radius: 8px;
+      border: 2px dashed var(--border);
+    }
+    
+    .image-upload-section label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-dark);
+    }
+    
+    .image-upload-section p {
+      font-size: 0.85em;
+      color: var(--text-medium);
+      margin-bottom: 12px;
+    }
+    
+    .btn-insert-image {
+      padding: 10px 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-insert-image:hover {
+      background: #B01030;
+    }
+    
+    /* Word Count */
+    .editor-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bg-light);
+      border-radius: 6px;
+      font-size: 0.9em;
+      color: var(--text-medium);
+    }
+    
+    .word-count {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header class="portal-header">
+    <div class="portal-header-content">
+      <h1 class="portal-title">Creator Portal</h1>
+      <div class="portal-user">
+        <div class="user-avatar" id="userAvatar">AC</div>
+        <div class="user-info">
+          <div class="user-info-name" id="userName">Loading...</div>
+          <div class="user-info-role" id="userRole">Author</div>
+        </div>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="portal-layout">
+    <aside class="portal-sidebar">
+      <ul class="portal-sidebar-menu">
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link active" data-view="dashboard">
+            📊 Dashboard
+          </a>
+        </li>
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link" data-view="articles">
+            📄 My Articles
+          </a>
+        </li>
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link" data-view="new">
+            ➕ New Article
+          </a>
+        </li>
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link" data-view="analytics">
+            📈 Analytics
+          </a>
+        </li>
+        <li class="portal-sidebar-item">
+          <a href="#" class="portal-sidebar-link" data-view="settings">
+            ⚙️ Settings
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <main class="portal-main">
+      <!-- Dashboard View -->
+      <div id="dashboardView" class="portal-view">
+        <div class="stats-grid" id="statsGrid">
+          <!-- Stats will be loaded by JS -->
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Articles</h2>
+          </div>
+          <div id="recentArticles">
+            <!-- Articles will be loaded by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Articles View -->
+      <div id="articlesView" class="portal-view" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">My Articles</h2>
+            <button class="btn-primary" onclick="showView('new')">
+              ➕ New Article
+            </button>
+          </div>
+          <div id="articlesList">
+            <!-- Articles list will be loaded by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- New Article View -->
+      <div id="newView" class="portal-view" style="display: none;">
+        <div class="card">
+          <h2 class="card-title">Create New Article</h2>
+          <form id="articleForm" class="editor-form">
+            <div class="form-group">
+              <label for="articleTitle">Title *</label>
+              <input 
+                type="text" 
+                id="articleTitle" 
+                name="title" 
+                placeholder="Enter article title..."
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="articleCategory">Category *</label>
+              <select id="articleCategory" name="category" required>
+                <option value="">Select category...</option>
+                <option value="দুর্গাপূজা">দুর্গাপূজা</option>
+                <option value="মেট্রো ম্যাটার্স">মেট্রো ম্যাটার্স</option>
+                <option value="মাছ-ভাত">মাছ-ভাত</option>
+                <option value="Heritage">Heritage</option>
+                <option value="শিক্ষা">শিক্ষা</option>
+                <option value="সংস্কৃতি">সংস্কৃতি</option>
+                <option value="আড্ডা">আড্ডা</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="articleImage">Featured Image URL *</label>
+              <input 
+                type="url" 
+                id="articleImage" 
+                name="image" 
+                placeholder="https://example.com/image.jpg"
+                required
+              >
+              <small style="color: var(--text-medium); font-size: 0.85em; display: block; margin-top: 6px;">
+                💡 Tip: Use Unsplash.com for free high-quality images
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="articleSummary">Summary *</label>
+              <textarea 
+                id="articleSummary" 
+                name="summary" 
+                rows="3"
+                placeholder="Brief summary of your article (150-200 characters)..."
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="articleContent">Content *</label>
+              
+              <!-- Image Helper -->
+              <div class="image-upload-section">
+                <label>📷 Insert Image in Article</label>
+                <p>Enter image URL and click "Insert Image" to add it to your article content.</p>
+                <div style="display: flex; gap: 10px;">
+                  <input 
+                    type="url" 
+                    id="imageUrlInput" 
+                    placeholder="https://example.com/image.jpg"
+                    style="flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 6px;"
+                  >
+                  <button type="button" class="btn-insert-image" onclick="insertImage()">
+                    Insert Image
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Quill Editor Container -->
+              <div id="editor-container"></div>
+              
+              <!-- Hidden input to store HTML content -->
+              <input type="hidden" id="articleContent" name="content">
+              
+              <!-- Editor Stats -->
+              <div class="editor-stats">
+                <span class="word-count" id="wordCount">0 words</span>
+                <span id="charCount">0 characters</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" onclick="saveAsDraft()">
+                💾 Save as Draft
+              </button>
+              <button type="submit" class="btn-primary">
+                📤 Submit for Review
+              </button>
+              <button type="button" class="btn-secondary" onclick="showView('articles')">
+                ❌ Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Analytics View -->
+      <div id="analyticsView" class="portal-view" style="display: none;">
+        <div class="card">
+          <h2 class="card-title">Performance Analytics</h2>
+          <p style="color: var(--text-medium); margin-top: 20px;">
+            Detailed analytics coming soon...
+          </p>
+        </div>
+      </div>
+
+      <!-- Settings View -->
+      <div id="settingsView" class="portal-view" style="display: none;">
+        <div class="card">
+          <h2 class="card-title">Account Settings</h2>
+          <p style="color: var(--text-medium); margin-top: 20px;">
+            Settings panel coming soon...
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/js/core/data.js"></script>
+  <script src="../assets/js/creator/creator.js"></script>
+</body>
+</html>
