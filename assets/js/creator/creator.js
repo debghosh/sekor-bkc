@@ -337,7 +337,15 @@ function deleteArticle(articleId) {
 }
 
 function logout() {
-  sessionStorage.removeItem('kcc_user');
-  sessionStorage.removeItem('kcc_role');
-  window.location.href = '../login.html';
+  if (confirm('Are you sure you want to logout?')) {
+    try {
+      sessionStorage.removeItem('kcc_user');
+      sessionStorage.removeItem('kcc_role');
+      localStorage.removeItem('kcc_followed_authors');
+      window.location.href = '../index.html'; // ✅ Fixed
+    } catch (e) {
+      console.error('Logout error:', e);
+      alert('Error logging out. Please try again.');
+    }
+  }
 }
