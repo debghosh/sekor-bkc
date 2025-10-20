@@ -26,6 +26,7 @@
       <a href="#" class="nav-tab active" data-tab="home">Home</a>
       <a href="#" class="nav-tab" data-tab="for-you">For You</a>
       <a href="#" class="nav-tab" data-tab="following">Following</a>
+      <a href="#" class="nav-tab" data-tab="saved">Saved Stories</a>
       <a href="#" class="nav-tab">আড্ডা</a>
       <a href="#" class="nav-tab">সংস্কৃতি</a>
       <a href="#" class="nav-tab">মাছ-ভাত</a>
@@ -81,6 +82,80 @@
         <div id="followingArticlesList" style="display: none;">
           <!-- Followed authors' articles will appear here -->
         </div>
+      </div>
+    </div>
+
+    <!-- Saved Stories Tab -->
+    <div id="saved-content" class="tab-content">
+      <div class="saved-header">
+        <div>
+          <h2 class="section-title" style="margin-bottom: 8px;">Your Saved Stories</h2>
+          <p style="color: var(--text-medium); font-size: 0.95em;">Filter by tags to find what you're looking for</p>
+        </div>
+        <div class="saved-filters" id="savedFilters">
+          <button class="filter-btn active" data-filter="all" onclick="filterSavedStories('all')">
+            All <span id="allCount">0</span>
+          </button>
+          <div id="tagFilters"></div>
+        </div>
+      </div>
+      
+      <div class="story-grid" id="savedStoriesGrid">
+        <div class="empty-state" style="grid-column: 1 / -1; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div style="font-size: 5em; margin-bottom: 20px; opacity: 0.3;">🔖</div>
+          <h3 style="font-size: 1.8rem; margin-bottom: 12px; color: #1a1a1a;">No saved stories yet</h3>
+          <p style="font-size: 1.1rem; color: #666; margin-bottom: 24px;">Save stories to read them later with custom tags</p>
+          <a href="#" class="btn-primary" onclick="showTab('home'); return false;">
+            Browse Stories
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Modal -->
+  <div id="saveModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Save Story</h3>
+        <button class="modal-close" onclick="closeSaveModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 20px;">
+          <h4 id="modalStoryTitle" style="font-size: 1.1em; font-weight: 600; color: var(--text-dark);"></h4>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark);">
+            Add Tags
+          </label>
+          <div class="tags-input-container">
+            <div class="tags-display" id="tagsDisplay"></div>
+            <input 
+              type="text" 
+              id="tagInput" 
+              class="tag-input" 
+              placeholder="Type a tag and press Enter..."
+              onkeypress="handleTagInput(event)"
+            >
+          </div>
+          <p class="form-hint">Press Enter to add a tag. You can add multiple tags to organize your saved stories.</p>
+        </div>
+
+        <div class="popular-tags">
+          <strong>Suggested Tags:</strong>
+          <div style="margin-top: 8px;">
+            <button class="tag-suggestion" onclick="addSuggestedTag('Must Read')">Must Read</button>
+            <button class="tag-suggestion" onclick="addSuggestedTag('Later')">Later</button>
+            <button class="tag-suggestion" onclick="addSuggestedTag('Reference')">Reference</button>
+            <button class="tag-suggestion" onclick="addSuggestedTag('Inspiration')">Inspiration</button>
+            <button class="tag-suggestion" onclick="addSuggestedTag('Research')">Research</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeSaveModal()">Cancel</button>
+        <button class="btn-primary" onclick="confirmSaveStory()">Save Story</button>
       </div>
     </div>
   </div>

@@ -1,5 +1,5 @@
 // home.js - Authenticated Homepage JavaScript
-// Refactored version with all fixes applied
+// Enhanced version with full save functionality and tag management
 
 // ============================================================================
 // CONSTANTS (Unique to home.js)
@@ -7,7 +7,8 @@
 const HOME_STORAGE_KEYS = {
   USER: 'kcc_user',
   ROLE: 'kcc_role',
-  FOLLOWED_AUTHORS: 'kcc_followed_authors'
+  FOLLOWED_AUTHORS: 'kcc_followed_authors',
+  SAVED_STORIES: 'kcc_saved_stories'
 };
 
 const HOME_LIMITS = {
@@ -22,7 +23,11 @@ const HOME_LIMITS = {
 const AppState = {
   currentUser: null,
   isAuthenticated: false,
-  followedAuthors: new Set()
+  followedAuthors: new Set(),
+  savedStories: new Map(),
+  currentStoryToSave: null,
+  currentStoryTags: [],
+  currentFilter: 'all'
 };
 
 // ============================================================================
@@ -75,12 +80,6 @@ const Utils = {
     return div.innerHTML;
   },
 
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  },
-
   formatDate(dateString) {
     if (!dateString) return 'Draft';
     try {
@@ -94,7 +93,7 @@ const Utils = {
   },
 
   getReadingTime(content) {
-    if (!content) return LIMITS.DEFAULT_READING_TIME;
+    if (!content) return HOME_LIMITS.DEFAULT_READING_TIME;
     const wordCount = content.split(/\s+/).length;
     return Math.ceil(wordCount / HOME_LIMITS.WORDS_PER_MINUTE) || HOME_LIMITS.DEFAULT_READING_TIME;
   }
@@ -123,8 +122,7 @@ const Auth = {
     try {
       sessionStorage.removeItem(HOME_STORAGE_KEYS.USER);
       sessionStorage.removeItem(HOME_STORAGE_KEYS.ROLE);
-      localStorage.removeItem(HOME_STORAGE_KEYS.FOLLOWED_AUTHORS);
-      // Redirect to landing page
+      // Don't remove followed authors or saved stories - keep them for next login
       window.location.href = '../index.html';
     } catch (e) {
       console.error('Logout error:', e);
@@ -161,6 +159,24 @@ const DataManager = {
     );
   },
 
+  loadSavedStories() {
+    const saved = Utils.safeLocalStorageGet(HOME_STORAGE_KEYS.SAVED_STORIES, []);
+    if (Array.isArray(saved)) {
+      saved.forEach(item => {
+        AppState.savedStories.set(item.articleId, {
+          articleId: item.articleId,
+          tags: item.tags || [],
+          savedAt: item.savedAt || new Date().toISOString()
+        });
+      });
+    }
+  },
+
+  saveSavedStories() {
+    const storiesArray = Array.from(AppState.savedStories.values());
+    Utils.safeLocalStorageSet(HOME_STORAGE_KEYS.SAVED_STORIES, storiesArray);
+  },
+
   getAuthorTopics(authorId) {
     try {
       const articles = DATA_STORE.getArticlesByAuthor(authorId);
@@ -170,6 +186,22 @@ const DataManager = {
       console.error('Error getting author topics:', e);
       return [];
     }
+  },
+
+  getAllTags() {
+    const tags = new Set();
+    AppState.savedStories.forEach(saved => {
+      saved.tags.forEach(tag => tags.add(tag));
+    });
+    return Array.from(tags).sort();
+  },
+
+  getTagCount(tag) {
+    let count = 0;
+    AppState.savedStories.forEach(saved => {
+      if (saved.tags.includes(tag)) count++;
+    });
+    return count;
   }
 };
 
@@ -193,7 +225,6 @@ const UI = {
         </div>
       `;
 
-      // Attach event listener for logout
       const logoutBtn = headerAuthSection.querySelector('.btn-logout-header');
       if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
@@ -207,28 +238,24 @@ const UI = {
   },
 
   updateAuthState() {
-    const forYouTab = document.getElementById('forYouTab');
-    const followingTab = document.getElementById('followingTab');
-    const loginPrompt = document.getElementById('loginPrompt');
+    const forYouTab = document.querySelector('.nav-tab[data-tab="for-you"]');
+    const followingTab = document.querySelector('.nav-tab[data-tab="following"]');
+    const savedTab = document.querySelector('.nav-tab[data-tab="saved"]');
 
-    if (!forYouTab || !followingTab) return;
+    if (!forYouTab || !followingTab || !savedTab) return;
 
     if (AppState.isAuthenticated) {
-      forYouTab.style.opacity = '1';
-      forYouTab.style.cursor = 'pointer';
-      forYouTab.title = '';
-      followingTab.style.opacity = '1';
-      followingTab.style.cursor = 'pointer';
-      followingTab.title = '';
-      if (loginPrompt) loginPrompt.style.display = 'none';
+      [forYouTab, followingTab, savedTab].forEach(tab => {
+        tab.style.opacity = '1';
+        tab.style.cursor = 'pointer';
+        tab.title = '';
+      });
     } else {
-      forYouTab.style.opacity = '0.5';
-      forYouTab.style.cursor = 'not-allowed';
-      forYouTab.title = 'Login to access personalized recommendations';
-      followingTab.style.opacity = '0.5';
-      followingTab.style.cursor = 'not-allowed';
-      followingTab.title = 'Login to follow authors';
-      if (loginPrompt) loginPrompt.style.display = 'block';
+      [forYouTab, followingTab, savedTab].forEach(tab => {
+        tab.style.opacity = '0.5';
+        tab.style.cursor = 'not-allowed';
+        tab.title = 'Login to access this feature';
+      });
     }
   },
 
@@ -238,6 +265,7 @@ const UI = {
     card.dataset.articleId = article.id;
 
     const isFollowing = AppState.followedAuthors.has(article.authorId);
+    const isSaved = AppState.savedStories.has(article.id);
     const avatar = DataManager.getUserAvatar(article.authorId);
     const formattedDate = Utils.formatDate(article.publishDate);
     const readingTime = Utils.getReadingTime(article.content);
@@ -259,7 +287,46 @@ const UI = {
       <div class="story-actions">
         <span class="story-action">⏱️ ${readingTime} min read</span>
         <span class="story-action">💬 ${article.engagement}</span>
-        <span class="story-action save-btn">📖 Save</span>
+        <span class="story-action save-btn ${isSaved ? 'saved' : ''}" data-article-id="${article.id}">
+          ${isSaved ? '✓ Saved' : '🔖 Save'}
+        </span>
+      </div>
+    `;
+
+    return card;
+  },
+
+  createSavedStoryCard(article, tags) {
+    const card = document.createElement('article');
+    card.className = 'story-card';
+    card.dataset.articleId = article.id;
+
+    const avatar = DataManager.getUserAvatar(article.authorId);
+    const formattedDate = Utils.formatDate(article.publishDate);
+    const readingTime = Utils.getReadingTime(article.content);
+
+    card.innerHTML = `
+      <img src="${Utils.escapeHtml(article.image)}" alt="${Utils.escapeHtml(article.title)}" class="story-image">
+      <div class="story-meta">
+        <img src="${Utils.escapeHtml(avatar)}" alt="${Utils.escapeHtml(article.author)}" class="author-avatar">
+        <span class="author-name">${Utils.escapeHtml(article.author)}</span>
+        <span>•</span>
+        <span>${Utils.escapeHtml(formattedDate)}</span>
+      </div>
+      <span class="category-tag">${Utils.escapeHtml(article.category)}</span>
+      ${tags.length > 0 ? `
+        <div class="story-tags">
+          ${tags.map(tag => `<span class="story-tag">${Utils.escapeHtml(tag)}</span>`).join('')}
+        </div>
+      ` : ''}
+      <h2 class="story-title">${Utils.escapeHtml(article.title)}</h2>
+      <p class="story-summary">${Utils.escapeHtml(article.summary)}</p>
+      <div class="story-actions">
+        <span class="story-action">⏱️ ${readingTime} min read</span>
+        <span class="story-action">💬 ${article.engagement}</span>
+        <span class="story-action unsave-btn" data-article-id="${article.id}">
+          ✓ Saved
+        </span>
       </div>
     `;
 
@@ -300,6 +367,7 @@ const ContentLoader = {
 
       publishedArticles.slice(0, HOME_LIMITS.FOR_YOU_ARTICLES).forEach(article => {
         const isFollowing = AppState.followedAuthors.has(article.authorId);
+        const isSaved = AppState.savedStories.has(article.id);
         const avatar = DataManager.getUserAvatar(article.authorId);
         const readingTime = Utils.getReadingTime(article.content);
 
@@ -330,14 +398,15 @@ const ContentLoader = {
               ⏱️ ${readingTime} min read • 💬 ${article.engagement}
             </div>
             <div style="display: flex; gap: 16px;">
-              <span class="story-action save-btn">📖 Save</span>
+              <span class="story-action save-btn ${isSaved ? 'saved' : ''}" data-article-id="${article.id}">
+                ${isSaved ? '✓ Saved' : '🔖 Save'}
+              </span>
             </div>
           </div>
         `;
 
         container.appendChild(storyDiv);
 
-        // Add click handler for navigation
         storyDiv.addEventListener('click', function(e) {
           if (e.target.classList.contains('btn-follow') || 
               e.target.classList.contains('save-btn')) {
@@ -403,7 +472,6 @@ const ContentLoader = {
 
       articlesList.innerHTML = `<div class="followed-list">${authorsHTML}</div>`;
 
-      // Setup unfollow button event listeners
       articlesList.querySelectorAll('.btn-unfollow').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -414,6 +482,200 @@ const ContentLoader = {
       console.error('Error loading following content:', e);
       articlesList.innerHTML = '<p>Error loading followed authors. Please refresh the page.</p>';
     }
+  },
+
+  loadSavedStories() {
+    const grid = document.getElementById('savedStoriesGrid');
+    if (!grid) return;
+
+    if (AppState.savedStories.size === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div style="font-size: 5em; margin-bottom: 20px; opacity: 0.3;">🔖</div>
+          <h3 style="font-size: 1.8rem; margin-bottom: 12px; color: #1a1a1a;">No saved stories yet</h3>
+          <p style="font-size: 1.1rem; color: #666; margin-bottom: 24px;">Save stories to read them later with custom tags</p>
+          <a href="#" class="btn-primary" onclick="showTab('home'); return false;">
+            Browse Stories
+          </a>
+        </div>
+      `;
+      SavedStories.updateTagFilters();
+      return;
+    }
+
+    // Filter stories based on current filter
+    let filteredStories = Array.from(AppState.savedStories.entries());
+    
+    if (AppState.currentFilter !== 'all') {
+      filteredStories = filteredStories.filter(([_, saved]) => 
+        saved.tags.includes(AppState.currentFilter)
+      );
+    }
+
+    if (filteredStories.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div style="font-size: 5em; margin-bottom: 20px; opacity: 0.3;">🏷️</div>
+          <h3 style="font-size: 1.8rem; margin-bottom: 12px; color: #1a1a1a;">No stories with "${Utils.escapeHtml(AppState.currentFilter)}" tag</h3>
+          <p style="font-size: 1.1rem; color: #666;">Try selecting a different tag.</p>
+        </div>
+      `;
+    } else {
+      grid.innerHTML = '';
+      filteredStories.forEach(([articleId, saved]) => {
+        const article = DATA_STORE.getArticleById(articleId);
+        if (article) {
+          const card = UI.createSavedStoryCard(article, saved.tags);
+          grid.appendChild(card);
+        }
+      });
+    }
+
+    SavedStories.updateTagFilters();
+  }
+};
+
+// ============================================================================
+// SAVED STORIES MODULE
+// ============================================================================
+const SavedStories = {
+  openModal(article) {
+    AppState.currentStoryToSave = article;
+    AppState.currentStoryTags = [];
+    
+    document.getElementById('modalStoryTitle').textContent = article.title;
+    document.getElementById('tagsDisplay').innerHTML = '';
+    document.getElementById('tagInput').value = '';
+    document.getElementById('saveModal').style.display = 'flex';
+    
+    // Focus on input
+    setTimeout(() => {
+      document.getElementById('tagInput').focus();
+    }, 100);
+  },
+
+  closeModal() {
+    document.getElementById('saveModal').style.display = 'none';
+    AppState.currentStoryToSave = null;
+    AppState.currentStoryTags = [];
+  },
+
+  handleTagInput(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const input = document.getElementById('tagInput');
+      const tag = input.value.trim();
+      
+      if (tag && !AppState.currentStoryTags.includes(tag)) {
+        AppState.currentStoryTags.push(tag);
+        this.renderTags();
+        input.value = '';
+      }
+    }
+  },
+
+  addSuggestedTag(tag) {
+    if (!AppState.currentStoryTags.includes(tag)) {
+      AppState.currentStoryTags.push(tag);
+      this.renderTags();
+    }
+  },
+
+  removeTag(tag) {
+    AppState.currentStoryTags = AppState.currentStoryTags.filter(t => t !== tag);
+    this.renderTags();
+  },
+
+  renderTags() {
+    const display = document.getElementById('tagsDisplay');
+    display.innerHTML = AppState.currentStoryTags.map(tag => `
+      <span class="tag-pill">
+        ${Utils.escapeHtml(tag)}
+        <button class="tag-remove" onclick="SavedStories.removeTag('${Utils.escapeHtml(tag).replace(/'/g, "\\'")}')">&times;</button>
+      </span>
+    `).join('');
+  },
+
+  confirmSave() {
+    if (!AppState.currentStoryToSave) return;
+
+    const articleId = AppState.currentStoryToSave.id;
+    
+    AppState.savedStories.set(articleId, {
+      articleId: articleId,
+      tags: [...AppState.currentStoryTags],
+      savedAt: new Date().toISOString()
+    });
+
+    DataManager.saveSavedStories();
+
+    // Update all save buttons for this story
+    document.querySelectorAll(`[data-article-id="${articleId}"]`).forEach(btn => {
+      if (btn.classList.contains('save-btn')) {
+        btn.textContent = '✓ Saved';
+        btn.classList.add('saved');
+      }
+    });
+
+    this.closeModal();
+
+    // Show success message
+    alert('Story saved successfully!');
+
+    // Reload saved stories if on that tab
+    const savedTab = document.querySelector('.nav-tab[data-tab="saved"]');
+    if (savedTab?.classList.contains('active')) {
+      ContentLoader.loadSavedStories();
+    }
+  },
+
+  unsaveStory(articleId) {
+    if (!confirm('Remove this story from your saved list?')) return;
+
+    AppState.savedStories.delete(articleId);
+    DataManager.saveSavedStories();
+
+    // Update all save buttons
+    document.querySelectorAll(`[data-article-id="${articleId}"]`).forEach(btn => {
+      if (btn.classList.contains('save-btn') || btn.classList.contains('unsave-btn')) {
+        btn.textContent = '🔖 Save';
+        btn.classList.remove('saved');
+        btn.classList.remove('unsave-btn');
+        btn.classList.add('save-btn');
+      }
+    });
+
+    // Reload saved stories
+    ContentLoader.loadSavedStories();
+  },
+
+  updateTagFilters() {
+    const tagFiltersContainer = document.getElementById('tagFilters');
+    const allCountSpan = document.getElementById('allCount');
+
+    if (!tagFiltersContainer || !allCountSpan) return;
+
+    // Update all count
+    allCountSpan.textContent = AppState.savedStories.size;
+
+    // Get all unique tags with counts
+    const allTags = DataManager.getAllTags();
+
+    if (allTags.length === 0) {
+      tagFiltersContainer.innerHTML = '';
+      return;
+    }
+
+    // Render tag filters
+    tagFiltersContainer.innerHTML = allTags.map(tag => {
+      const count = DataManager.getTagCount(tag);
+      const isActive = AppState.currentFilter === tag;
+      return `
+        <button class="filter-btn ${isActive ? 'active' : ''}" data-filter="${Utils.escapeHtml(tag)}" onclick="filterSavedStories('${Utils.escapeHtml(tag).replace(/'/g, "\\'")}')">
+          ${Utils.escapeHtml(tag)} <span>${count}</span>
+        </button>
+      `;
+    }).join('');
   }
 };
 
@@ -476,15 +738,26 @@ const Actions = {
     ContentLoader.loadFollowingContent();
   },
 
-  toggleSave(btn) {
+  handleSaveClick(btn) {
     if (!btn) return;
 
-    if (btn.textContent.includes('Save')) {
-      btn.textContent = '✓ Saved';
-      btn.style.color = 'var(--primary)';
+    const articleId = parseInt(btn.dataset.articleId);
+    const article = DATA_STORE.getArticleById(articleId);
+    
+    if (!article) return;
+
+    if (!AppState.isAuthenticated) {
+      alert('Please login to save articles');
+      window.location.href = '../../login.html';
+      return;
+    }
+
+    if (AppState.savedStories.has(articleId)) {
+      // Already saved - unsave it
+      SavedStories.unsaveStory(articleId);
     } else {
-      btn.textContent = '📖 Save';
-      btn.style.color = '';
+      // Open modal to add tags
+      SavedStories.openModal(article);
     }
   }
 };
@@ -502,7 +775,7 @@ const Navigation = {
         const tabName = this.dataset.tab;
 
         // Check authentication for protected tabs
-        if ((tabName === 'for-you' || tabName === 'following') && !AppState.isAuthenticated) {
+        if ((tabName === 'for-you' || tabName === 'following' || tabName === 'saved') && !AppState.isAuthenticated) {
           alert('Please login to access this feature');
           window.location.href = '../../login.html';
           return;
@@ -534,6 +807,8 @@ const Navigation = {
       ContentLoader.loadForYouContent();
     } else if (tabName === 'following') {
       ContentLoader.loadFollowingContent();
+    } else if (tabName === 'saved') {
+      ContentLoader.loadSavedStories();
     }
   }
 };
@@ -548,7 +823,8 @@ const EventHandlers = {
       const storyCard = e.target.closest('.story-card');
       if (storyCard && 
           !e.target.closest('.btn-follow') && 
-          !e.target.closest('.save-btn')) {
+          !e.target.closest('.save-btn') &&
+          !e.target.closest('.unsave-btn')) {
         const articleId = storyCard.dataset.articleId;
         if (articleId) {
           window.location.href = `article.html?id=${articleId}`;
@@ -575,14 +851,16 @@ const EventHandlers = {
     document.addEventListener('click', function(e) {
       if (e.target.classList.contains('save-btn')) {
         e.stopPropagation();
-        
-        if (!AppState.isAuthenticated) {
-          alert('Please login to save articles');
-          window.location.href = '../../login.html';
-          return;
-        }
-        
-        Actions.toggleSave(e.target);
+        Actions.handleSaveClick(e.target);
+      }
+    });
+
+    // Unsave buttons
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('unsave-btn')) {
+        e.stopPropagation();
+        const articleId = parseInt(e.target.dataset.articleId);
+        SavedStories.unsaveStory(articleId);
       }
     });
 
@@ -597,11 +875,50 @@ const EventHandlers = {
 };
 
 // ============================================================================
+// GLOBAL FUNCTIONS (for onclick handlers in HTML)
+// ============================================================================
+function showTab(tabName) {
+  Navigation.showTab(tabName);
+}
+
+function closeSaveModal() {
+  SavedStories.closeModal();
+}
+
+function handleTagInput(event) {
+  SavedStories.handleTagInput(event);
+}
+
+function addSuggestedTag(tag) {
+  SavedStories.addSuggestedTag(tag);
+}
+
+function confirmSaveStory() {
+  SavedStories.confirmSave();
+}
+
+function filterSavedStories(filter) {
+  AppState.currentFilter = filter;
+  
+  // Update active state on filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.filter === filter) {
+      btn.classList.add('active');
+    }
+  });
+
+  // Reload saved stories with filter
+  ContentLoader.loadSavedStories();
+}
+
+// ============================================================================
 // INITIALIZATION
 // ============================================================================
 function init() {
   try {
     DataManager.loadFollowedAuthors();
+    DataManager.loadSavedStories();
     Auth.checkSession();
     ContentLoader.loadStories();
     EventHandlers.setupGlobalListeners();
