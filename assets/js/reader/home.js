@@ -304,6 +304,7 @@ const UI = {
     const avatar = DataManager.getUserAvatar(article.authorId);
     const formattedDate = Utils.formatDate(article.publishDate);
     const readingTime = Utils.getReadingTime(article.content);
+    const isFollowing = AppState.followedAuthors.has(article.authorId);
 
     card.innerHTML = `
       <img src="${Utils.escapeHtml(article.image)}" alt="${Utils.escapeHtml(article.title)}" class="story-image">
@@ -312,6 +313,9 @@ const UI = {
         <span class="author-name">${Utils.escapeHtml(article.author)}</span>
         <span>•</span>
         <span>${Utils.escapeHtml(formattedDate)}</span>
+        <button class="btn-follow ${isFollowing ? 'following' : ''}" data-author-id="${article.authorId}">
+          ${isFollowing ? 'Following' : '+ Follow'}
+        </button>
       </div>
       <span class="category-tag">${Utils.escapeHtml(article.category)}</span>
       ${tags.length > 0 ? `
