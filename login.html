@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - শেকড় - The Kolkata Chronicle</title>
+  <title>Login - The Kolkata Chronicle</title>
   <style>
     * {
       margin: 0;
@@ -11,64 +11,249 @@
       box-sizing: border-box;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
-
     :root {
-      --primary: #DC143C;
+      --primary: #8B5CF6;
+      --text-dark: #1a1a1a;
+      --text-medium: #666;
+      --text-light: #999;
+      --bg-light: #f8f9fa;
+      --border: #e0e0e0;
     }
 
-    .login-container {
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       padding: 20px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 480px;
     }
 
     .login-card {
       background: white;
-      border-radius: 12px;
-      padding: 40px;
-      max-width: 440px;
-      width: 100%;
+      border-radius: 16px;
+      padding: 48px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 
     .login-logo {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--primary);
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5em;
       text-align: center;
-      margin-bottom: 30px;
+      color: var(--primary);
+      margin-bottom: 8px;
     }
 
     .login-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 10px;
       text-align: center;
+      font-size: 1.8em;
+      margin-bottom: 8px;
+      color: var(--text-dark);
     }
 
     .login-subtitle {
-      color: #666;
       text-align: center;
-      margin-bottom: 30px;
+      color: var(--text-medium);
+      margin-bottom: 32px;
     }
 
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      background: var(--bg-light);
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: 600;
+      color: var(--text-medium);
+      transition: all 0.2s;
+    }
+
+    .auth-tab.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .auth-method {
+      display: none;
+    }
+
+    .auth-method.active {
+      display: block;
+    }
+
+    .info-box {
+      background: var(--bg-light);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 0.9em;
+      color: var(--text-medium);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+      background: white;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #7c3aed;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      background: var(--text-light);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 24px 0;
+      color: #999;
+      position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 42%;
+      height: 1px;
+      background: #ddd;
+    }
+
+    .divider::before {
+      left: 0;
+    }
+
+    .divider::after {
+      right: 0;
+    }
+
+    .signup-prompt {
+      text-align: center;
+      margin-top: 24px;
+      padding: 20px;
+      background: var(--bg-light);
+      border-radius: 8px;
+    }
+
+    .signup-prompt p {
+      color: var(--text-medium);
+      margin-bottom: 16px;
+      font-size: 0.95em;
+    }
+
+    .btn-secondary {
+      display: inline-block;
+      padding: 12px 32px;
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    .forgot-password {
+      text-align: right;
+      margin-top: 8px;
+    }
+
+    .forgot-password a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+
+    /* Demo mode styles */
     .demo-note {
-      background: #f8f9fa;
+      background: #fff3cd;
       padding: 15px;
       border-radius: 6px;
       margin-bottom: 20px;
-      border-left: 4px solid var(--primary);
-      font-size: 0.9rem;
-    }
-
-    .demo-note strong {
-      color: var(--primary);
+      font-size: 0.85rem;
+      border-left: 4px solid #ffc107;
     }
 
     .demo-accounts {
@@ -97,118 +282,8 @@
       color: #555;
     }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 1rem;
-      transition: border-color 0.2s;
-      background: white;
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
-    }
-
     select.form-input {
       cursor: pointer;
-    }
-
-    .btn-login {
-      width: 100%;
-      padding: 14px;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-login:hover {
-      background: #b01030;
-    }
-
-    .btn-login:active {
-      transform: translateY(1px);
-    }
-
-    .btn-subscribe {
-      width: 100%;
-      padding: 14px;
-      background: white;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-
-    .btn-subscribe:hover {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-subscribe:active {
-      transform: translateY(1px);
-    }
-
-    .divider {
-      text-align: center;
-      margin: 30px 0;
-      color: #999;
-      position: relative;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 45%;
-      height: 1px;
-      background: #ddd;
-    }
-
-    .divider::before {
-      left: 0;
-    }
-
-    .divider::after {
-      right: 0;
-    }
-
-    .back-link {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .back-link a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .back-link a:hover {
-      text-decoration: underline;
     }
 
     .role-description {
@@ -231,99 +306,297 @@
     <div class="login-card">
       <div class="login-logo">শেকড়</div>
       <h1 class="login-title">Welcome Back</h1>
-      <p class="login-subtitle">Login to access your portal</p>
+      <p class="login-subtitle">Sign in to your account</p>
 
-      <div class="demo-note">
-        <strong>Demo Mode:</strong> Select a role and click "Login" to test different portals.
+      <!-- Auth Method Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('magic')">✨ Magic Link</button>
+        <button class="auth-tab" onclick="switchTab('password')">🔐 Password</button>
+        <button class="auth-tab" onclick="switchTab('demo')">🧪 Demo</button>
       </div>
 
-      <div class="demo-accounts">
-        <h4>📝 Quick Test Accounts:</h4>
-        <ul>
-          <li><strong>Reader:</strong> Any email + Reader role</li>
-          <li><strong>Author:</strong> anindita@example.com</li>
-          <li><strong>Admin:</strong> admin@kcc.com</li>
-        </ul>
-      </div>
-
-      <form id="loginForm">
-        <div class="form-group">
-          <label class="form-label" for="email">Email</label>
-          <input 
-            type="email" 
-            id="email" 
-            class="form-input" 
-            placeholder="your@email.com"
-            value="demo@kolkatachronicle.com"
-            required
-          >
+      <!-- Magic Link Method -->
+      <div id="magicMethod" class="auth-method active">
+        <div class="info-box">
+          🔒 We'll send a secure one-time link to your email.<br>
+          No password needed!
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <input 
-            type="password" 
-            id="password" 
-            class="form-input" 
-            placeholder="••••••••"
-            value="demo123"
-            required
-          >
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="role">Login As</label>
-          <select id="role" class="form-input" required>
-            <option value="reader">Reader - Browse and read articles</option>
-            <option value="author">Author / Creator - Write and manage articles</option>
-            <option value="admin">Administrator - Manage platform and approve content</option>
-          </select>
-          
-          <div id="roleDescription" class="role-description">
-            Select a role to see what you can do
+        <form onsubmit="sendMagicLink(event)">
+          <div class="form-group">
+            <label class="form-label" for="magicEmail">Email Address</label>
+            <input 
+              type="email" 
+              id="magicEmail" 
+              class="form-input" 
+              placeholder="your@email.com"
+              required
+            >
           </div>
+
+          <button type="submit" class="btn-primary" id="magicBtn">
+            Send Magic Link
+          </button>
+        </form>
+      </div>
+
+      <!-- Password Method -->
+      <div id="passwordMethod" class="auth-method">
+        <div class="info-box">
+          🔐 Sign in with your email and password
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <button type="submit" class="btn-login">Login</button>
-          <button type="button" class="btn-subscribe" onclick="window.location.href='subscribe.html'">Subscribe</button>
+        <form onsubmit="handlePasswordLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">Email Address</label>
+            <input 
+              type="email" 
+              id="loginEmail" 
+              class="form-input" 
+              placeholder="your@email.com"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input 
+              type="password" 
+              id="loginPassword" 
+              class="form-input" 
+              placeholder="Enter your password"
+              required
+            >
+            <div class="forgot-password">
+              <a href="#" onclick="alert('Password reset coming soon!'); return false;">Forgot password?</a>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">
+            Sign In
+          </button>
+        </form>
+      </div>
+
+      <!-- Demo Login Method -->
+      <div id="demoMethod" class="auth-method">
+        <div class="demo-note">
+          <strong>Demo Mode:</strong> Test different user roles without creating an account.
         </div>
-      </form>
+
+        <div class="demo-accounts">
+          <h4>📝 Quick Test Accounts:</h4>
+          <ul>
+            <li><strong>Reader:</strong> demo@example.com (any password)</li>
+            <li><strong>Author:</strong> author@example.com (any password)</li>
+            <li><strong>Admin:</strong> admin@example.com (any password)</li>
+          </ul>
+        </div>
+
+        <form onsubmit="handleDemoLogin(event)">
+          <div class="form-group">
+            <label class="form-label" for="demoEmail">Email</label>
+            <input 
+              type="email" 
+              id="demoEmail" 
+              class="form-input" 
+              placeholder="demo@example.com"
+              value="demo@example.com"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="demoPassword">Password</label>
+            <input 
+              type="password" 
+              id="demoPassword" 
+              class="form-input" 
+              placeholder="any password"
+              value="demo123"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="demoRole">Login As</label>
+            <select id="demoRole" class="form-input" required>
+              <option value="reader">Reader - Browse and read articles</option>
+              <option value="author">Author - Write and manage articles</option>
+              <option value="admin">Admin - Manage platform</option>
+            </select>
+            
+            <div id="roleDescription" class="role-description">
+              Select a role to see what you can do
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">
+            Demo Login
+          </button>
+        </form>
+      </div>
+
+      <!-- Signup Prompt -->
+      <div class="signup-prompt">
+        <p><strong>Don't have an account?</strong></p>
+        <a href="subscribe.html" class="btn-secondary">Subscribe Now</a>
+      </div>
 
       <div class="back-link">
-        <a href="./index.html">← Back to Home</a>
+        <a href="index.html">← Back to Home</a>
       </div>
     </div>
   </div>
 
-  <script src="./assets/js/core/data.js"></script>
-  <script src="./assets/js/auth/login.js"></script>
-
   <script>
-    // Show role descriptions on change
-    document.getElementById('role').addEventListener('change', function() {
-      const roleDesc = document.getElementById('roleDescription');
-      const descriptions = {
-        reader: '📖 Access personalized feed, follow authors, save articles',
-        author: '✍️ Create articles, manage drafts, submit for review, track performance',
-        admin: '👨‍💼 Review submissions, manage users, view analytics, publish content'
-      };
-      
-      roleDesc.textContent = descriptions[this.value];
-      roleDesc.classList.add('active');
-    });
+    // Tab Switching
+    function switchTab(method) {
+      // Update tabs
+      document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
 
-    // Quick fill buttons for testing
-    document.getElementById('role').addEventListener('change', function() {
-      const role = this.value;
-      const emailInput = document.getElementById('email');
-      
-      if (role === 'author') {
-        emailInput.value = 'anindita@example.com';
-      } else if (role === 'admin') {
-        emailInput.value = 'admin@kcc.com';
+      // Update methods
+      document.querySelectorAll('.auth-method').forEach(m => m.classList.remove('active'));
+      if (method === 'magic') {
+        document.getElementById('magicMethod').classList.add('active');
+      } else if (method === 'password') {
+        document.getElementById('passwordMethod').classList.add('active');
+      } else {
+        document.getElementById('demoMethod').classList.add('active');
       }
-    });
+    }
+
+    // Magic Link Login
+    function sendMagicLink(event) {
+      event.preventDefault();
+      const email = document.getElementById('magicEmail').value;
+      const btn = document.getElementById('magicBtn');
+      
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      
+      // Check if user exists (in production, check with backend)
+      const userExists = checkUserExists(email);
+      
+      if (!userExists) {
+        btn.disabled = false;
+        btn.textContent = 'Send Magic Link';
+        alert('No account found with this email. Please subscribe first!');
+        return;
+      }
+      
+      // Redirect to auth page for magic link flow
+      setTimeout(() => {
+        window.location.href = 'auth.html?email=' + encodeURIComponent(email);
+      }, 500);
+    }
+
+    // Password Login
+    function handlePasswordLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      // Verify credentials (in production, verify with backend)
+      const user = verifyPassword(email, password);
+      
+      if (!user) {
+        alert('Invalid email or password');
+        return;
+      }
+
+      // Create session
+      sessionStorage.setItem('kcc_user', JSON.stringify(user));
+      sessionStorage.setItem('kcc_role', 'reader');
+
+      // Redirect to home
+      window.location.href = 'reader/home.html';
+    }
+
+    // Demo Login
+    function handleDemoLogin(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('demoEmail').value;
+      const role = document.getElementById('demoRole').value;
+
+      const user = {
+        email: email,
+        name: email.split('@')[0],
+        role: role
+      };
+
+      sessionStorage.setItem('kcc_user', JSON.stringify(user));
+      sessionStorage.setItem('kcc_role', role);
+
+      // Redirect based on role
+      if (role === 'reader') {
+        window.location.href = 'reader/home.html';
+      } else if (role === 'author') {
+        window.location.href = 'author/dashboard.html';
+      } else if (role === 'admin') {
+        window.location.href = 'admin/dashboard.html';
+      }
+    }
+
+    // Helper Functions
+    function checkUserExists(email) {
+      // Check if user has completed subscription confirmation
+      const subs = JSON.parse(localStorage.getItem('kcc_pending_subscriptions') || '{}');
+      for (let token in subs) {
+        if (subs[token].email === email && subs[token].confirmed) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function verifyPassword(email, password) {
+      // Get user ID from email
+      let hash = 0;
+      for (let i = 0; i < email.length; i++) {
+        const char = email.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      const userId = 'user_' + Math.abs(hash).toString(36);
+      
+      // Check stored password
+      const storedPassword = localStorage.getItem(`kcc_password_${userId}`);
+      if (storedPassword && atob(storedPassword) === password) {
+        // Get subscription data
+        const subs = JSON.parse(localStorage.getItem('kcc_pending_subscriptions') || '{}');
+        for (let token in subs) {
+          if (subs[token].email === email && subs[token].confirmed) {
+            return {
+              id: userId,
+              email: email,
+              name: subs[token].name,
+              subscription: subs[token]
+            };
+          }
+        }
+      }
+      return null;
+    }
+
+    // Demo role descriptions
+    const roleSelect = document.getElementById('demoRole');
+    if (roleSelect) {
+      roleSelect.addEventListener('change', function() {
+        const roleDesc = document.getElementById('roleDescription');
+        const descriptions = {
+          reader: '📖 Access personalized feed, follow authors, save articles',
+          author: '✍️ Create articles, manage drafts, submit for review',
+          admin: '👨‍💼 Review submissions, manage users, view analytics'
+        };
+        
+        roleDesc.textContent = descriptions[this.value];
+        roleDesc.classList.add('active');
+      });
+    }
   </script>
 </body>
 </html>

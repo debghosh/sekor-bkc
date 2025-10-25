@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication - The Kolkata Chronicle</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .auth-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: white;
+      border-radius: 16px;
+      padding: 48px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .auth-logo h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2em;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .auth-logo p {
+      color: var(--text-medium);
+      font-size: 0.95em;
+    }
+
+    .auth-form-group {
+      margin-bottom: 24px;
+    }
+
+    .auth-form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .auth-form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1em;
+      transition: all 0.2s;
+    }
+
+    .auth-form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    .auth-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .auth-btn:hover {
+      background: #7c3aed;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+
+    .auth-btn:disabled {
+      background: var(--text-light);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .auth-divider {
+      text-align: center;
+      margin: 32px 0;
+      position: relative;
+    }
+
+    .auth-divider::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .auth-divider span {
+      background: white;
+      padding: 0 16px;
+      color: var(--text-medium);
+      position: relative;
+      z-index: 1;
+    }
+
+    .success-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .success-icon {
+      font-size: 4em;
+      margin-bottom: 20px;
+      animation: scaleIn 0.3s ease-out;
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+
+    .success-state h2 {
+      font-size: 1.8em;
+      margin-bottom: 12px;
+      color: var(--text-dark);
+    }
+
+    .success-state p {
+      color: var(--text-medium);
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .email-preview {
+      background: var(--bg-light);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 24px;
+      text-align: left;
+    }
+
+    .email-preview h3 {
+      font-size: 1.1em;
+      margin-bottom: 12px;
+      color: var(--text-dark);
+    }
+
+    .email-preview p {
+      font-size: 0.9em;
+      color: var(--text-medium);
+      margin-bottom: 12px;
+    }
+
+    .magic-link-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .magic-link-btn:hover {
+      background: #7c3aed;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .back-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .spinner {
+      border: 3px solid var(--bg-light);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <h1>শেকড়</h1>
+        <p>The Kolkata Chronicle</p>
+      </div>
+
+      <!-- Initial Login Form -->
+      <div id="loginForm">
+        <h2 style="text-align: center; margin-bottom: 24px; font-size: 1.5em;">Sign in to your account</h2>
+        
+        <form id="magicLinkForm" onsubmit="sendMagicLink(event)">
+          <div class="auth-form-group">
+            <label for="email">Email Address</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="your@email.com" 
+              required
+              autocomplete="email"
+            >
+          </div>
+
+          <button type="submit" class="auth-btn" id="submitBtn">
+            Send Magic Link
+          </button>
+        </form>
+
+        <div class="auth-divider">
+          <span>New to Kolkata Chronicle?</span>
+        </div>
+
+        <p style="text-align: center; color: var(--text-medium);">
+          Don't have an account? No problem! Just enter your email above and we'll create one for you.
+        </p>
+
+        <div class="back-link">
+          <a href="index.html">← Back to Home</a>
+        </div>
+      </div>
+
+      <!-- Success State (Email Sent) -->
+      <div id="successState" style="display: none;">
+        <div class="success-state">
+          <div class="success-icon">📧</div>
+          <h2>Check your email!</h2>
+          <p>We've sent a magic link to <strong id="sentToEmail"></strong></p>
+          <p style="font-size: 0.95em;">Click the link in the email to sign in. The link expires in 15 minutes.</p>
+
+          <!-- Simulated Email Preview (for demo purposes) -->
+          <div class="email-preview">
+            <h3>📬 Email Preview (Demo)</h3>
+            <p><strong>From:</strong> Kolkata Chronicle &lt;auth@kolkatachronicle.com&gt;</p>
+            <p><strong>Subject:</strong> Your magic link to sign in</p>
+            <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border);">
+            <p>Click the button below to sign in to your account:</p>
+            <a href="#" class="magic-link-btn" id="demoMagicLink" onclick="handleMagicLinkClick(event)">
+              🔐 Sign in to Kolkata Chronicle
+            </a>
+            <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-light);">
+              This link expires in 15 minutes and can only be used once.
+            </p>
+          </div>
+
+          <div class="back-link">
+            <a href="#" onclick="resetForm(); return false;">← Try a different email</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState" style="display: none;">
+        <div class="loading">
+          <div class="spinner"></div>
+          <h2>Verifying your magic link...</h2>
+          <p style="color: var(--text-medium); margin-top: 12px;">Please wait a moment</p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" style="display: none;">
+        <div class="success-state">
+          <div class="success-icon">❌</div>
+          <h2>Invalid or expired link</h2>
+          <p>This magic link is no longer valid. Links expire after 15 minutes.</p>
+          <button class="auth-btn" onclick="resetForm()" style="margin-top: 20px;">
+            Request a new link
+          </button>
+          <div class="back-link">
+            <a href="index.html">← Back to Home</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/auth/magic-link.js"></script>
+</body>
+</html>
