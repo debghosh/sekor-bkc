@@ -225,7 +225,7 @@ const INITIAL_DATA = {
       id: 3,
       title: "Metro Extension Blues: Why South Kolkata Remains Underserved",
       category: "Metro",
-      image: "/metro.png",
+      image: "metro.png",
       summary: "An investigation into the delays and challenges facing Kolkata's metro expansion plans.",
       content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
       author: "Rahul Bose",
